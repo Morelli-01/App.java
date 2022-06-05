@@ -24,9 +24,7 @@ public class NFT_Object {
         this.MEurl = "https://magiceden.io/item-details/"+this.NftToken;
         this.price = price;
         this.collectionName = collectionName;
-        JsonNode J = Unirest.get("https://public-api.solscan.io/token/meta?tokenAddress="+this.NftToken).asJson().getBody();
-        Map<String, Object> M= J.getObject().toMap();
-        objName= String.valueOf(M.get("name"));
+        objName = JSONParser.parseFromString(Unirest.get("https://public-api.solscan.io/token/meta?tokenAddress="+this.NftToken).asString().getBody(), "name");
     }
 
 

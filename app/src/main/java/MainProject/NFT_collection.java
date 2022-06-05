@@ -99,17 +99,15 @@ public class NFT_collection {
     public boolean init(String collectionName) {
         System.out.println(collectionName);
         //TODO: handling request for collection like "eclypse"" that don't have a website
-        if(Unirest.get("https://api-mainnet.magiceden.io/collections/"+collectionName+"?edge_cache=true").asString().getStatusText().equals("OK"))
-        {
-            JsonNode J = Unirest.get("https://api-mainnet.magiceden.io/collections/" + collectionName + "?edge_cache=true").asJson().getBody();
-            JSONObject O = J.getObject();
-            Map<String, Object> M = O.toMap();
-            setDescription(String.valueOf(M.get("description")));
-            setDiscord(String.valueOf(M.get("discord")));
-            setName(String.valueOf(M.get("symbol")));
-            setTwitter(String.valueOf(M.get("twitter")));
-            setWebsite(String.valueOf(M.get("website")));
-            setCollectionPic(String.valueOf(M.get("image")));
+        if(Unirest.get("https://api-mainnet.magiceden.io/collections/"+collectionName+"?edge_cache=true").asString().getStatusText().equals("OK")){
+        String[] str = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/collections/" + collectionName + "?edge_cache=true").asString().getBody(),
+               new String[]{"description","discord", "symbol", "twitter", "website", "image" });
+            setDescription(str[0]);
+            setDiscord(str[1]);
+            setName(str[2]);
+            setTwitter(str[3]);
+            setWebsite(str[4]);
+            setCollectionPic(str[5]);
             return true;
         }
         return false;
