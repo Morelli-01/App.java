@@ -1,10 +1,7 @@
 package MainProject;
 
-import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
@@ -71,7 +67,8 @@ public class GUI extends JFrame {
                 return;
             }
 
-            MonitorThread M = new MonitorThread(tabbedPane, n);
+            MonitorThread M = new MonitorThread();
+            M.MonitorThreadInit(tabbedPane, n);
             M.start();
             n.setMonitorTread(M);
             Coll.add(n);
@@ -85,8 +82,8 @@ public class GUI extends JFrame {
             tabbedPane.remove(index);
             index--;
             MonitorThread tmp = Coll.get(index).getMonitorThread();
+            //tmp.stop();
             tmp.RequestStop();
-
             Coll.remove(index);
             loadingLabel.setText("Monitoring " + Coll.size() + " Collection");
         });
@@ -107,6 +104,7 @@ public class GUI extends JFrame {
             tmp.RequestRestart();
         });
     }
+
     private void tps() {
         Thread T = new Thread(() -> {
             try {
@@ -237,9 +235,7 @@ public class GUI extends JFrame {
             public void mousePressed(MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI(slideNameLabel.getToolTipText()));
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (URISyntaxException ex) {
+                } catch (IOException | URISyntaxException ex) {
                     throw new RuntimeException(ex);
                 }
             }

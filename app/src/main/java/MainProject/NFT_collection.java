@@ -1,16 +1,16 @@
 package MainProject;
 
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.json.JSONObject;
 
+import kong.unirest.Unirest;
 import javax.swing.*;
 import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
-public class NFT_collection {
+import static java.lang.Thread.sleep;
+
+
+public class NFT_collection{
     private String name=null;
     private String description;
     private String discord;
@@ -122,5 +122,4 @@ public class NFT_collection {
                 +"\nDiscord: "+discord
                 +"\nTwitter: "+twitter+"\n";
     }
-
 }

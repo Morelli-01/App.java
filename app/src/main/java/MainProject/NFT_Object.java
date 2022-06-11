@@ -1,9 +1,8 @@
 package MainProject;
 
-import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 
-import java.util.Map;
+
 
 public class NFT_Object {
     private String NftToken;
@@ -20,11 +19,15 @@ public class NFT_Object {
         this.collectionName = collectionName;
     }
     public NFT_Object(String nftToken,  String price, String collectionName) {
+
         NftToken = nftToken;
         this.MEurl = "https://magiceden.io/item-details/"+this.NftToken;
         this.price = price;
         this.collectionName = collectionName;
-        objName = JSONParser.parseFromString(Unirest.get("https://public-api.solscan.io/token/meta?tokenAddress="+this.NftToken).asString().getBody(), "name");
+        objName = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/rpc/getNFTByMintAddress/"+
+                this.NftToken +"?useRarity=true").asString().getBody(), "title");
+     // objName = JSONParser.parseFromString(Unirest.get("https://public-api.solscan.io/token/meta?tokenAddress="+this.NftToken).asString().getBody(), "name");
+
     }
 
 

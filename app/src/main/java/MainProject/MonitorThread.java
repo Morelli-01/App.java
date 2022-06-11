@@ -1,24 +1,20 @@
 package MainProject;
 
-import com.formdev.flatlaf.FlatDefaultsAddon;
-import com.google.gson.internal.LinkedTreeMap;
-import kong.unirest.JsonNode;
+
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-import kong.unirest.json.JSONObject;
+
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.lang.management.ThreadInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Map;
+
 
 import static java.awt.Color.*;
 
@@ -34,7 +30,7 @@ public class MonitorThread extends Thread {
     private JLabel twIcon;
     private JLabel wbIcon;
     private JSpinner spinner;
-    private final NFT_collection n;
+    private NFT_collection n;
     private Boolean stopRequested = false;
     private Boolean pauseRequested = false;
     private Double FP = 0.0;
@@ -44,9 +40,11 @@ public class MonitorThread extends Thread {
     private Integer Delay;
 
 
-    private final JScrollBar Y;
+    private JScrollBar Y;
 
-    public MonitorThread(JTabbedPane tabbedPane, NFT_collection n) {
+    public MonitorThread(){}
+
+    public void MonitorThreadInit(JTabbedPane tabbedPane, NFT_collection n) {
         tabbedPane.add(n.getName(), mainPanel);
         SpinnerModel model = new SpinnerNumberModel(2, 0.5, 60, 0.1);
         spinner.setModel(model);
@@ -119,7 +117,6 @@ public class MonitorThread extends Thread {
                 }
             });
         }
-
     }
 
     public void RequestStop() {
@@ -130,28 +127,28 @@ public class MonitorThread extends Thread {
         return stopRequested;
     }
 
-    public void restartRequested(){
-        while(isStopRequested());
+    public void restartRequested() {
+        while (isStopRequested()) ;
         this.start();
     }
 
-    public void RequestPause(){
-        pauseRequested=true;
+    public void RequestPause() {
+        pauseRequested = true;
     }
 
-    public void RequestRestart(){
-       pauseRequested=false;
+    public void RequestRestart() {
+        pauseRequested = false;
     }
 
     @Override
     public void run() {
-
-        try {
-            while (!stopRequested) {
-                while(pauseRequested){
-                  //  System.out.println("il thread "+ this.getName() + " è in pausa");
+        while (!stopRequested) {
+            try {
+                while (pauseRequested) {
+                    //System.out.println("il thread "+ this.getName() + " è in pausa");
                     sleep(2000);
                 }
+
                 String[] s = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/" +
                                 n.getName() +
                                 "?edge_cache=true")
@@ -160,11 +157,14 @@ public class MonitorThread extends Thread {
 
                 Integer v24 = (int) (Double.parseDouble(s[0]) / Math.pow(10, 9));
 
+
                 String[] s2 = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/rpc/getListedNFTsByQueryLite?q=%7B%22%24match%22%3A%7B%22collectionSymbol%22%3A%22"
                                 + n.getName()
-                                + "%22%7D%2C%22%24sort%22%3A%7B%22takerAmount%22%3A1%7D%2C%22%24skip%22%3A0%2C%22%24limit%22%3A200%2C%22status%22%3A%5B%5D%7D")
+                                + "%22%7D%2C%22%24sort%22%3A%7B%22takerAmount%22%3A1%7D%2C%22%24skip%22%3A0%2C%22%24limit%22%3A20%2C%22status%22%3A%5B%5D%7D")
                         .asString()
                         .getBody(), new String[]{"mintAddress", "price", "collectionName"});
+
+
                 cheapest = new NFT_Object(s2[0], s2[1], s2[2]);
 
                 if (FP > Double.parseDouble(cheapest.getPrice())) {
@@ -187,30 +187,27 @@ public class MonitorThread extends Thread {
                 //stampa del floorprice attuale e del volume nelle ultime 24h
 
                 volume24h.setText("Volume in last 24h :" + String.valueOf(v24) + " SOL");
-                this.listedCount.setText("Listed Count: " +s[1]);
+                this.listedCount.setText("Listed Count: " + s[1]);
 
                 //set della scrollbar in fondo al range così segue la scritte che vengono aggiunte dalla append
                 Y.setValue(Y.getMaximum());
 
                 Delay = (int) ((double) spinner.getValue() * 1000);
 
-                //dalay 2sec dalla prossima request
-
                 sleep(Delay);
 
-            }
-            stopRequested = false;
-            System.out.println("thread stopped");
-        } catch (UnirestException | NullPointerException | InterruptedException ex) {
-            System.out.println(ex.getMessage());
-            System.out.println("Probably something wrong on ME end about "+this.getName()+" on collection "+n.getName());
-            try {
-                sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            start();
-        }
 
+            } catch (UnirestException | NullPointerException | InterruptedException ex) {
+                System.out.println(ex.getMessage());
+                System.out.println("Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
+                try {
+                    sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        stopRequested = false;
+        System.out.println("thread stopped");
     }
 }
