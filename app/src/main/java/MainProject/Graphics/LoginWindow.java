@@ -82,9 +82,14 @@ public class LoginWindow extends JFrame implements ActionListener, ItemListener 
     public void actionPerformed(ActionEvent e) {
 
         if(e.getSource()==OKButton){
-            String UserName = CampoNome.getText();
+            String UserName = CampoNome.getText();;
             String UserPsw = String.valueOf(CampoPSW.getPassword());
-         if(!M.get(UserName).equals(UserPsw)||UserName.equals(null)){
+            if (M.get(UserName)==null){
+                JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+count+".","Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(!M.get(UserName).equals(UserPsw)){
              JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+count+".","Error",
                      JOptionPane.ERROR_MESSAGE);
             }else{
@@ -163,7 +168,7 @@ public class LoginWindow extends JFrame implements ActionListener, ItemListener 
     }
 
     public void setGUIVisible(boolean Value){
-      /*  if(User!="DebugUser"){
+        /*if(User!="DebugUser"){
             System.out.close();
         }*/
         G.setVisible(Value);
