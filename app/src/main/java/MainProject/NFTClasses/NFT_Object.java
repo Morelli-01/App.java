@@ -1,5 +1,6 @@
-package MainProject;
+package MainProject.NFTClasses;
 
+import MainProject.Utils.JSONParser;
 import kong.unirest.Unirest;
 
 

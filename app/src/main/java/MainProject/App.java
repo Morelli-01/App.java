@@ -3,6 +3,7 @@
  */
 package MainProject;
 
+import MainProject.Graphics.GUI;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import javax.swing.*;

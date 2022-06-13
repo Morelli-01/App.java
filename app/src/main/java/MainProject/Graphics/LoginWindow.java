@@ -1,4 +1,6 @@
-package MainProject;
+package MainProject.Graphics;
+
+import MainProject.Graphics.GUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,18 +84,16 @@ public class LoginWindow extends JFrame implements ActionListener, ItemListener 
         if(e.getSource()==OKButton){
             String UserName = CampoNome.getText();
             String UserPsw = String.valueOf(CampoPSW.getPassword());
-            if(!UserName.equals(getUser())||!UserPsw.equals(getPsw())){
-                JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+count+".","Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }else if(M.get(UserName).equals(UserPsw)){
-                User=UserName;
-                Psw=UserPsw;
-                System.out.println("Succesfull Login"); //Attivazione GUI di nick
-                setGUIVisible(true);
-                dispose();
+         if(!M.get(UserName).equals(UserPsw)||UserName.equals(null)){
+             JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+count+".","Error",
+                     JOptionPane.ERROR_MESSAGE);
             }else{
-                JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+count+".","Error",
-                        JOptionPane.ERROR_MESSAGE);
+
+             User=UserName;
+             Psw=UserPsw;
+             System.out.println("Succesfull Login"); //Attivazione GUI di nick
+             setGUIVisible(true);
+             dispose();
             }
 
             count--;
@@ -163,9 +163,9 @@ public class LoginWindow extends JFrame implements ActionListener, ItemListener 
     }
 
     public void setGUIVisible(boolean Value){
-        if(User!="DebugUser"){
+      /*  if(User!="DebugUser"){
             System.out.close();
-        }
+        }*/
         G.setVisible(Value);
     }
 }

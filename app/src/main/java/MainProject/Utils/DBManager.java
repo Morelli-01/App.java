@@ -1,4 +1,4 @@
-package MainProject.database;
+package MainProject.Utils;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -14,6 +14,7 @@ import java.util.TimeZone;
  * @author Nicola Bicocchi
  */
 public class DBManager {
+
     public static final String JDBC_Driver_SQLite = "org.sqlite.JDBC";
     public static final String JDBC_URL_SQLite = String.format("jdbc:sqlite:%s", Paths.get(ooprogrammingdir(), "dbConn.sqlite"));
 
@@ -26,7 +27,7 @@ public class DBManager {
 
     public static String ooprogrammingdir() {
         String path = String.format("%s%s%s%s%s", System.getProperty("user.home"), System.getProperty("file.separator"),
-                "Desktop", System.getProperty("file.separator"), "dbConn");
+                "Desktop", System.getProperty("file.separator"), "demo");
         new File(path).mkdirs();
         return path;
     }

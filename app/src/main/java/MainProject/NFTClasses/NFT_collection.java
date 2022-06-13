@@ -1,6 +1,8 @@
-package MainProject;
+package MainProject.NFTClasses;
 
 
+import MainProject.Graphics.MonitorThread;
+import MainProject.Utils.JSONParser;
 import kong.unirest.Unirest;
 import javax.swing.*;
 import java.awt.*;
