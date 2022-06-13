@@ -1,15 +1,21 @@
 package MainProject;
 
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static java.lang.Thread.sleep;
 
@@ -41,6 +47,9 @@ public class GUI extends JFrame {
     public GUI() {
 
         super("GUI");
+
+
+
         LoginWindow login = new LoginWindow(this);
         menu_initializer();
         statsPage_initializer();
@@ -75,7 +84,7 @@ public class GUI extends JFrame {
             loadingLabel.setText("Monitoring " + Coll.size() + " Collection");
         });
         Remove.addActionListener(e -> {
-            if(Coll.size()==0)  return;
+            if (Coll.size() == 0) return;
             int index = tabbedPane.getSelectedIndex();
 
             if (index == 0) return;
@@ -88,7 +97,7 @@ public class GUI extends JFrame {
             loadingLabel.setText("Monitoring " + Coll.size() + " Collection");
         });
         Pause.addActionListener(e -> {
-            if(Coll.size()==0)  return;
+            if (Coll.size() == 0) return;
             int index = tabbedPane.getSelectedIndex();
             if (index == 0) return;
             index--;
@@ -96,7 +105,7 @@ public class GUI extends JFrame {
             tmp.RequestPause();
         });
         Restart.addActionListener(e -> {
-            if(Coll.size()==0)  return;
+            if (Coll.size() == 0) return;
             int index = tabbedPane.getSelectedIndex();
             if (index == 0) return;
             index--;
@@ -136,17 +145,17 @@ public class GUI extends JFrame {
 
     private void volumes() {
         Thread T = new Thread(() -> {
-            try{
+            try {
                 while (true) {
                     if (Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getStatusText().equals("OK")) {
                         String[] s = {"total", "last24Hrs"};
                         s = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getBody(), s);
-                        volume24HLabel.setText("24H Volume: " + (int)Double.parseDouble(s[1]) + " SOL");
-                        totalVolumeLabel.setText("Total Volume: " + (int)Double.parseDouble(s[0]) + " Mln SOL");
+                        volume24HLabel.setText("24H Volume: " + (int) Double.parseDouble(s[1]) + " SOL");
+                        totalVolumeLabel.setText("Total Volume: " + (int) Double.parseDouble(s[0]) + " Mln SOL");
                     }
                     sleep(60000);
                 }
-            }catch ( UnirestException | NullPointerException | InterruptedException e){
+            } catch (UnirestException | NullPointerException | InterruptedException e) {
                 System.out.println("Exception from retriving ME volumes");
                 volumes();
                 return;
@@ -166,7 +175,7 @@ public class GUI extends JFrame {
                 String[][] result = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/popular_collections?more=true&timeRange=7d&edge_cache=true")
                         .asString()
                         .getBody(), s, 5);
-                for(String[] str : result){
+                for (String[] str : result) {
                     url = new URL(str[0]);
                     icon = new ImageIcon(url);
                     resizedIcon = icon.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT);
@@ -202,17 +211,17 @@ public class GUI extends JFrame {
 
     private void exchange() {
         Thread T = new Thread(() -> {
-            try{
-            while (true) {
-                if (Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getStatusText().equals("OK")) {
+            try {
+                while (true) {
+                    if (Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getStatusText().equals("OK")) {
 
-                String s = JSONParser.parseFromString(Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getBody(), "price");
-                    solusdtLabel.setText("SOL/USDT: " + s.substring(0 ,4) + "$");
+                        String s = JSONParser.parseFromString(Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getBody(), "price");
+                        solusdtLabel.setText("SOL/USDT: " + s.substring(0, 4) + "$");
+                    }
+                    sleep(10000);
                 }
-                sleep(10000);
-            }
-            }catch (NullPointerException | UnirestException | InterruptedException e){
-                System.out.println("Exception from "+ this.getName() +" regarding exchange class");
+            } catch (NullPointerException | UnirestException | InterruptedException e) {
+                System.out.println("Exception from " + this.getName() + " regarding exchange class");
 
                 exchange();
                 return;
@@ -245,5 +254,151 @@ public class GUI extends JFrame {
         volumes();
         exchange();
 
+    }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new GridLayoutManager(3, 4, new Insets(0, 0, 0, 0), -1, -1));
+        final JMenuBar menuBar1 = new JMenuBar();
+        menuBar1.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        mainPanel.add(menuBar1, new GridConstraints(0, 0, 1, 4, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(107, 42), null, 0, false));
+        menu = new JMenu();
+        menu.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        menu.setText("Menu");
+        menuBar1.add(menu, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(44, 17), null, 0, false));
+        edit = new JMenu();
+        edit.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        edit.setText("Edit");
+        menuBar1.add(edit, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        menuBar1.add(spacer1, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setForeground(new Color(-3276545));
+        mainPanel.add(tabbedPane, new GridConstraints(2, 0, 1, 4, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(200, 200), null, 0, false));
+        statsPage = new JPanel();
+        statsPage.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
+        statsPage.setBackground(new Color(-16514044));
+        statsPage.setForeground(new Color(-16514044));
+        statsPage.setOpaque(false);
+        tabbedPane.addTab("Stats Page", statsPage);
+        imageLabel = new JLabel();
+        imageLabel.setForeground(new Color(-16514044));
+        imageLabel.setText("");
+        statsPage.add(imageLabel, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        gifLabel = new JLabel();
+        gifLabel.setText("");
+        statsPage.add(gifLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        loadingLabel = new JLabel();
+        loadingLabel.setText("Monitoring 0 \nCollection");
+        statsPage.add(loadingLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        sliderPanel = new JPanel();
+        sliderPanel.setLayout(new GridLayoutManager(3, 5, new Insets(0, 0, 0, 0), -1, -1));
+        sliderPanel.setBackground(new Color(-12828863));
+        sliderPanel.setForeground(new Color(-4473925));
+        statsPage.add(sliderPanel, new GridConstraints(0, 2, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        radioButton2 = new JRadioButton();
+        radioButton2.setEnabled(false);
+        radioButton2.setMargin(new Insets(2, 2, 2, 2));
+        radioButton2.setOpaque(false);
+        radioButton2.setSelected(false);
+        radioButton2.setText("");
+        sliderPanel.add(radioButton2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        radioButton3 = new JRadioButton();
+        radioButton3.setEnabled(false);
+        radioButton3.setMargin(new Insets(2, 2, 2, 2));
+        radioButton3.setSelected(false);
+        radioButton3.setText("");
+        sliderPanel.add(radioButton3, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        slideImageLabel = new JLabel();
+        slideImageLabel.setText("");
+        sliderPanel.add(slideImageLabel, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        radioButton1 = new JRadioButton();
+        radioButton1.setBackground(new Color(-12828863));
+        radioButton1.setEnabled(false);
+        radioButton1.setForeground(new Color(-1));
+        radioButton1.setHideActionText(true);
+        radioButton1.setMargin(new Insets(2, 2, 2, 2));
+        radioButton1.setOpaque(false);
+        radioButton1.setSelected(false);
+        radioButton1.setText("");
+        sliderPanel.add(radioButton1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        radioButton4 = new JRadioButton();
+        radioButton4.setEnabled(false);
+        radioButton4.setMargin(new Insets(2, 2, 2, 2));
+        radioButton4.setSelected(false);
+        radioButton4.setText("");
+        sliderPanel.add(radioButton4, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        radioButton5 = new JRadioButton();
+        radioButton5.setEnabled(false);
+        radioButton5.setMargin(new Insets(2, 2, 2, 2));
+        radioButton5.setSelected(false);
+        radioButton5.setText("");
+        sliderPanel.add(radioButton5, new GridConstraints(2, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        slideNameLabel = new JLabel();
+        Font slideNameLabelFont = this.$$$getFont$$$("Cooper Black", -1, 20, slideNameLabel.getFont());
+        if (slideNameLabelFont != null) slideNameLabel.setFont(slideNameLabelFont);
+        slideNameLabel.setText("");
+        slideNameLabel.putClientProperty("html.disable", Boolean.FALSE);
+        sliderPanel.add(slideNameLabel, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        tpsLabel = new JLabel();
+        tpsLabel.setForeground(new Color(-3276545));
+        tpsLabel.setText("TPS:--");
+        tpsLabel.setToolTipText("transaction per second solana can handle");
+        mainPanel.add(tpsLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        volume24HLabel = new JLabel();
+        volume24HLabel.setForeground(new Color(-3276545));
+        volume24HLabel.setText("24h Volume:--");
+        mainPanel.add(volume24HLabel, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        totalVolumeLabel = new JLabel();
+        totalVolumeLabel.setForeground(new Color(-3276545));
+        totalVolumeLabel.setText("Total Volume:--");
+        mainPanel.add(totalVolumeLabel, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        solusdtLabel = new JLabel();
+        solusdtLabel.setForeground(new Color(-3276545));
+        solusdtLabel.setText("SOL/USDT:--");
+        mainPanel.add(solusdtLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
+        if (currentFont == null) return null;
+        String resultName;
+        if (fontName == null) {
+            resultName = currentFont.getName();
+        } else {
+            Font testFont = new Font(fontName, Font.PLAIN, 10);
+            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
+                resultName = fontName;
+            } else {
+                resultName = currentFont.getName();
+            }
+        }
+        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
+        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
+        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
+        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return mainPanel;
     }
 }
