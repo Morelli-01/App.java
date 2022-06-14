@@ -46,9 +46,10 @@ public class MonitorThread extends Thread {
     private JScrollBar Y;
 
     public MonitorThread() {
+
     }
 
-    public void MonitorThreadInit(JTabbedPane tabbedPane, NFT_collection n) {
+    public MonitorThread(JTabbedPane tabbedPane, NFT_collection n) {
         tabbedPane.add(n.getName(), mainPanel);
         SpinnerModel model = new SpinnerNumberModel(2, 0.5, 60, 0.1);
         spinner.setModel(model);

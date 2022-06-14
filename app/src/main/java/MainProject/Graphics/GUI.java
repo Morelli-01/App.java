@@ -47,7 +47,7 @@ public class GUI extends JFrame {
         dbConn C = new dbConn();
 
 
-        LoginWindow login = new LoginWindow(this, C.getCredentials());
+        EventQueue.invokeLater(()-> new LoginWindow(this, C.getCredentials()));
         menu_initializer();
         statsPage_initializer();
 
@@ -73,8 +73,9 @@ public class GUI extends JFrame {
                 return;
             }
 
-            MonitorThread M = new MonitorThread();
-            M.MonitorThreadInit(tabbedPane, n);
+            MonitorThread M = new MonitorThread(tabbedPane, n);
+           // M.MonitorThread(tabbedPane, n);
+            //M.MonitorThreadInit(tabbedPane, n);
             M.start();
             n.setMonitorTread(M);
             Coll.add(n);
@@ -148,7 +149,7 @@ public class GUI extends JFrame {
                         String[] s = {"total", "last24Hrs"};
                         s = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getBody(), s);
                         volume24HLabel.setText("24H Volume: " + (int) Double.parseDouble(s[1]) + " SOL");
-                        totalVolumeLabel.setText("Total Volume: " + (int) Double.parseDouble(s[0]) + " Mln SOL");
+                        totalVolumeLabel.setText("Total Volume: " + (int) Double.parseDouble(s[0]) + " SOL");
                     }
                     sleep(60000);
                 }

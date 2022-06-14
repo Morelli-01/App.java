@@ -7,12 +7,14 @@ import MainProject.Graphics.GUI;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.EventListener;
 
 
 public class App {
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(new FlatDarkLaf());
-        new GUI();
+        EventQueue.invokeLater(() -> new GUI());
 
     }
 }
