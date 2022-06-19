@@ -39,7 +39,7 @@ public class GUI extends JFrame {
     private JRadioButton radioButton4;
     private JRadioButton radioButton5;
     private JLabel slideNameLabel;
-    protected static Object[] choseOption = {"Decrease", "Increase"};
+    protected static final Object[] choseOption = {"Decrease", "Increase"};
 
     private ArrayList<NFT_collection> Coll = new ArrayList<>();
 

@@ -1,11 +1,13 @@
 package MainProject.Graphics;
 
 
-import MainProject.Utils.JSONParser;
+import MainProject.Utils.*;
 import MainProject.NFTClasses.NFT_Object;
 import MainProject.NFTClasses.NFT_collection;
+import MainProject.Utils.WindowsNotification;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+
 
 
 import javax.swing.*;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+
 
 
 import static java.awt.Color.*;
@@ -216,17 +219,19 @@ public class MonitorThread extends Thread {
                 for(String[] str  : triggerList){
                     if(str[1].equals(GUI.choseOption[0])){
                         if(FP<=Double.parseDouble(str[0])){
-                            showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
+                            //showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
+                            WindowsNotification.sendNotification("The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
                             triggerList.remove(str);
+
                         }
                     }else{
                         if(FP>=Double.parseDouble(str[0])){
-                            showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
+                            //showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
+                            WindowsNotification.sendNotification("The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
                             triggerList.remove(str);
                         }
                     }
                 }
-
 
                 //stampa del floorprice attuale e del volume nelle ultime 24h
 
@@ -241,7 +246,8 @@ public class MonitorThread extends Thread {
                 sleep(Delay);
 
 
-            } catch (UnirestException | NullPointerException | InterruptedException | ConcurrentModificationException ex) {
+            } catch (UnirestException | NullPointerException | InterruptedException | ConcurrentModificationException |
+                     AWTException ex) {
                 System.out.println(ex.toString());
                 System.out.println("Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
                 try {
