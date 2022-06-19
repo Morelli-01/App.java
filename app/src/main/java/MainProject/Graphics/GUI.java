@@ -15,6 +15,7 @@ import java.net.*;
 import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
+import static javax.swing.JOptionPane.*;
 
 public class GUI extends JFrame {
 
@@ -38,8 +39,9 @@ public class GUI extends JFrame {
     private JRadioButton radioButton4;
     private JRadioButton radioButton5;
     private JLabel slideNameLabel;
+    protected static Object[] choseOption = {"Decrease", "Increase"};
 
-    ArrayList<NFT_collection> Coll = new ArrayList<>();
+    private ArrayList<NFT_collection> Coll = new ArrayList<>();
 
     public GUI() {
 
@@ -47,14 +49,16 @@ public class GUI extends JFrame {
         dbConn C = new dbConn();
 
 
-        EventQueue.invokeLater(()-> new LoginWindow(this, C.getCredentials()));
+        //EventQueue.invokeLater(()-> new LoginWindow(this, C.getCredentials()));
+
+
         menu_initializer();
         statsPage_initializer();
 
         setSize(600, 400);
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(false);
+        setVisible(true);
     }
 
     private void menu_initializer() {
@@ -62,20 +66,22 @@ public class GUI extends JFrame {
         JMenuItem Remove = new JMenuItem("Remove");
         JMenuItem Pause = new JMenuItem("Pause");
         JMenuItem Restart = new JMenuItem("Restart");
+        JMenuItem Trigger = new JMenuItem("Add Trigger");
         menu.add(addCollection);
         edit.add(Remove);
         edit.add(Pause);
         edit.add(Restart);
+        edit.add(Trigger);
         addCollection.addActionListener(e -> {
             NFT_collection n = new NFT_collection();
-            if (!n.init(JOptionPane.showInputDialog(mainPanel, "Please insert a valid Collection name"))) {
-                JOptionPane.showMessageDialog(mainPanel, "invalid Collection Name", "Error", JOptionPane.ERROR_MESSAGE);
+            String input = showInputDialog(mainPanel, "Please insert a valid Collection name");
+            if (!n.init(input)) {
+                showMessageDialog(mainPanel, "invalid Collection Name", "Error", ERROR_MESSAGE);
                 return;
             }
 
-            MonitorThread M = new MonitorThread(tabbedPane, n);
-           // M.MonitorThread(tabbedPane, n);
-            //M.MonitorThreadInit(tabbedPane, n);
+            MonitorThread M;
+            M = new MonitorThread(tabbedPane, n);
             M.start();
             n.setMonitorTread(M);
             Coll.add(n);
@@ -109,6 +115,18 @@ public class GUI extends JFrame {
             index--;
             MonitorThread tmp = Coll.get(index).getMonitorThread();
             tmp.RequestRestart();
+        });
+        Trigger.addActionListener(e->{
+            if (Coll.size() == 0) return;
+            int index = tabbedPane.getSelectedIndex();
+            if (index == 0) return;
+            String input = showInputDialog(mainPanel, "Insert a valid trigger value", QUESTION_MESSAGE);
+
+            Object input2 = showInputDialog(mainPanel, "Choose the kind of trigger", "Input", PLAIN_MESSAGE, null, choseOption, choseOption[0]);
+
+            index--;
+            MonitorThread tmp = Coll.get(index).getMonitorThread();
+            tmp.setTriggerList(Double.parseDouble(input), (String)input2);
         });
     }
 

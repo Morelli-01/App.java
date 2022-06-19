@@ -17,9 +17,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 
 import static java.awt.Color.*;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class MonitorThread extends Thread {
     private JTextArea monitorTA;
@@ -37,6 +41,7 @@ public class MonitorThread extends Thread {
     private Boolean stopRequested = false;
     private Boolean pauseRequested = false;
     private Double FP = 0.0;
+    private ArrayList<String[]> triggerList = new ArrayList<String[]>();
 
     private NFT_Object cheapest;
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -145,6 +150,24 @@ public class MonitorThread extends Thread {
         pauseRequested = false;
     }
 
+    public ArrayList<String[]> getTriggerList() {
+        return triggerList;
+    }
+
+    public void setTriggerList(Double value, String str2) {
+        if(value<=0){
+            showMessageDialog(mainPanel, "invalid Trigger Value", "Error", ERROR_MESSAGE);
+            return;
+        }
+        String str1 = String.valueOf(value);
+        String[] in = {str1, str2};
+       for(String[] str : triggerList){
+           if(str[0].equals(str1) && str[1].equals(str2))
+               return;
+       }
+        triggerList.add(in);
+    }
+
     @Override
     public void run() {
         while (!stopRequested) {
@@ -189,9 +212,25 @@ public class MonitorThread extends Thread {
 
                 FP = Double.valueOf(cheapest.getPrice());
 
+                //controllo se il nuovo FP triggera qualche trigger
+                for(String[] str  : triggerList){
+                    if(str[1].equals(GUI.choseOption[0])){
+                        if(FP<=Double.parseDouble(str[0])){
+                            showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
+                            triggerList.remove(str);
+                        }
+                    }else{
+                        if(FP>=Double.parseDouble(str[0])){
+                            showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the desidered floorprice of "+ str[0]);
+                            triggerList.remove(str);
+                        }
+                    }
+                }
+
+
                 //stampa del floorprice attuale e del volume nelle ultime 24h
 
-                volume24h.setText("Volume in last 24h :" + String.valueOf(v24) + " SOL");
+                volume24h.setText("Volume in last 24h :" + v24 + " SOL");
                 this.listedCount.setText("Listed Count: " + s[1]);
 
                 //set della scrollbar in fondo al range così segue la scritte che vengono aggiunte dalla append
@@ -202,8 +241,8 @@ public class MonitorThread extends Thread {
                 sleep(Delay);
 
 
-            } catch (UnirestException | NullPointerException | InterruptedException ex) {
-                System.out.println(ex.getMessage());
+            } catch (UnirestException | NullPointerException | InterruptedException | ConcurrentModificationException ex) {
+                System.out.println(ex.toString());
                 System.out.println("Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
                 try {
                     sleep(5000);
