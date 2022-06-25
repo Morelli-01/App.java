@@ -16,17 +16,17 @@ public class LoginWindow extends JFrame implements ActionListener, ItemListener 
     private final Map M;
     private GUI G;
 
-    private static JButton OKButton = new JButton("Ok");
-    private static JButton ResetButton = new JButton("Reset Password");
-    private static JLabel  UserNameTF = new JLabel("User Name");
-    private static JTextField CampoNome = new JTextField("UserName",20);
-    private static JLabel PSWTF = new JLabel("Password");
-    private static JPasswordField CampoPSW = new JPasswordField("123456",20);
-    private static JMenuItem helpItem =new JMenuItem("?");
-    private static JMenuItem exitItem = new JMenuItem("Exit");
-    private static JMenu filemenu = new JMenu("file");
-    private static JMenu questmenu = new JMenu("help");
-    private static JMenuBar menuBar= new JMenuBar();
+    private static final JButton OKButton = new JButton("Ok");
+    private static final JButton ResetButton = new JButton("Reset Password");
+    private static final JLabel  UserNameTF = new JLabel("User Name");
+    private static final JTextField CampoNome = new JTextField("UserName",20);
+    private static final JLabel PSWTF = new JLabel("Password");
+    private static final JPasswordField CampoPSW = new JPasswordField("123456",20);
+    private static final JMenuItem helpItem =new JMenuItem("?");
+    private static final JMenuItem exitItem = new JMenuItem("Exit");
+    private static final JMenu filemenu = new JMenu("file");
+    private static final JMenu questmenu = new JMenu("help");
+    private static final JMenuBar menuBar= new JMenuBar();
     private int count =2;
 
     public LoginWindow(GUI G, Map M) {
@@ -82,7 +82,7 @@ public class LoginWindow extends JFrame implements ActionListener, ItemListener 
     public void actionPerformed(ActionEvent e) {
 
         if(e.getSource()==OKButton){
-            String UserName = CampoNome.getText();;
+            String UserName = CampoNome.getText();
             String UserPsw = String.valueOf(CampoPSW.getPassword());
             if (M.get(UserName)==null){
                 JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+count+".","Error",

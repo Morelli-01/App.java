@@ -41,7 +41,7 @@ public class GUI extends JFrame {
     private JLabel slideNameLabel;
     protected static final Object[] choseOption = {"Decrease", "Increase"};
 
-    private ArrayList<NFT_collection> Coll = new ArrayList<>();
+    private final ArrayList<NFT_collection> Coll = new ArrayList<>();
 
     public GUI() {
 
@@ -116,7 +116,7 @@ public class GUI extends JFrame {
             MonitorThread tmp = Coll.get(index).getMonitorThread();
             tmp.RequestRestart();
         });
-        Trigger.addActionListener(e->{
+        Trigger.addActionListener(e -> {
             if (Coll.size() == 0) return;
             int index = tabbedPane.getSelectedIndex();
             if (index == 0) return;
@@ -126,14 +126,15 @@ public class GUI extends JFrame {
 
             index--;
             MonitorThread tmp = Coll.get(index).getMonitorThread();
-            tmp.setTriggerList(Double.parseDouble(input), (String)input2);
+            tmp.setTriggerList(Double.parseDouble(input), (String) input2);
         });
     }
 
     private void tps() {
         Thread T = new Thread(() -> {
-            try {
-                while (true) {
+            while (true) {
+                try {
+
                     if (Unirest.get("https://api.solanart.io/get_solana_tps").asString().getStatusText().equals("OK")) {
                         String tps = JSONParser.parseFromString(Unirest.get("https://api.solanart.io/get_solana_tps").asString().getBody(), "tps");
                         tpsLabel.setText("TPS: " + tps);
@@ -143,26 +144,26 @@ public class GUI extends JFrame {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
-            } catch (NullPointerException | UnirestException e) {
-                System.out.println("Something went wrong with solanart api");
-                try {
-                    sleep(10000);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-                tps();
-                return;
-            }
 
+                } catch (NullPointerException | UnirestException e) {
+                    System.out.println("Something went wrong with solanart api");
+                    try {
+                        sleep(10000);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    tps();
+                    return;
+                }
+            }
         });
         T.start();
     }
 
     private void volumes() {
         Thread T = new Thread(() -> {
-            try {
-                while (true) {
+            while (true) {
+                try {
                     if (Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getStatusText().equals("OK")) {
                         String[] s = {"total", "last24Hrs"};
                         s = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getBody(), s);
@@ -170,11 +171,11 @@ public class GUI extends JFrame {
                         totalVolumeLabel.setText("Total Volume: " + (int) Double.parseDouble(s[0]) + " SOL");
                     }
                     sleep(60000);
+                } catch (UnirestException | NullPointerException | InterruptedException e) {
+                    System.out.println("Exception from retriving ME volumes");
+                    volumes();
+                    return;
                 }
-            } catch (UnirestException | NullPointerException | InterruptedException e) {
-                System.out.println("Exception from retriving ME volumes");
-                volumes();
-                return;
             }
         });
         T.start();
@@ -227,22 +228,18 @@ public class GUI extends JFrame {
 
     private void exchange() {
         Thread T = new Thread(() -> {
-            try {
-                while (true) {
+            while (true) {
+                try {
                     if (Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getStatusText().equals("OK")) {
 
                         String s = JSONParser.parseFromString(Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getBody(), "price");
                         solusdtLabel.setText("SOL/USDT: " + s.substring(0, 4) + "$");
                     }
                     sleep(10000);
+                } catch (NullPointerException | UnirestException | InterruptedException e) {
+                    System.out.println("Exception from " + this.getName() + " regarding exchange class");
                 }
-            } catch (NullPointerException | UnirestException | InterruptedException e) {
-                System.out.println("Exception from " + this.getName() + " regarding exchange class");
-
-                exchange();
-                return;
             }
-
         });
 
         T.start();
@@ -271,5 +268,6 @@ public class GUI extends JFrame {
         exchange();
 
     }
+
 
 }

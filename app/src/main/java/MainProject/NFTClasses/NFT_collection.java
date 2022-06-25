@@ -99,7 +99,7 @@ public class NFT_collection{
     }
 
     public boolean init(String collectionName) {
-        System.out.println(collectionName);
+        //  System.out.println(collectionName);
         //TODO: handling request for collection like "eclypse"" that don't have a website
         if(Unirest.get("https://api-mainnet.magiceden.io/collections/"+collectionName+"?edge_cache=true").asString().getStatusText().equals("OK")){
         String[] str = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/collections/" + collectionName + "?edge_cache=true").asString().getBody(),

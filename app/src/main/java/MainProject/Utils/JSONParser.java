@@ -38,8 +38,13 @@ public class JSONParser {
             for (Scanner it = new Scanner(s).useDelimiter(":"); it.hasNext(); ) {
                 if (obj.toString().equals(value)) {
                     obj = it.next();
-                    if(value.equals("image")){
-                        result[index] = String.valueOf(obj)+":"+String.valueOf(it.next());
+                    if(value.equals("image")||value.equals("discord")||value.equals("twitter")||value.equals("website")){
+                        if( String.valueOf(obj).equals("")){
+                            result[index] = "null";
+                            index++;
+                            break;
+                        }
+                        result[index] = obj +":"+ it.next();
                     }else{
                         result[index] = String.valueOf(obj);
                     }
@@ -67,9 +72,14 @@ public class JSONParser {
             index=0;
             for (Scanner it = new Scanner(s).useDelimiter(":"); it.hasNext(); ) {
                 if (obj.toString().equals(value)) {
-                    if(value.equals("image")){
+                    if(value.equals("image")||value.equals("discord")||value.equals("twitter")||value.equals("website")){
+                        if( String.valueOf(obj).equals("")){
+                            result[index][index2] = "null";
+                            index++;
+                            if(index>=nitem)break;
+                        }
                         obj = it.next();
-                        result[index][index2] = String.valueOf(obj)+":"+String.valueOf(it.next());
+                        result[index][index2] = obj +":"+ it.next();
                     }else {
                         obj = it.next();
                         result[index][index2] = String.valueOf(obj);

@@ -8,13 +8,11 @@ import com.formdev.flatlaf.FlatDarkLaf;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.EventListener;
 
 
 public class App {
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(new FlatDarkLaf());
-        EventQueue.invokeLater(() -> new GUI());
-
+        EventQueue.invokeLater(GUI::new);
     }
 }

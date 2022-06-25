@@ -2,9 +2,7 @@ package MainProject.Graphics;
 
 
 import MainProject.Utils.*;
-import MainProject.NFTClasses.NFT_Object;
-import MainProject.NFTClasses.NFT_collection;
-import MainProject.Utils.WindowsNotification;
+import MainProject.NFTClasses.*;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
@@ -21,8 +19,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
-
-
 
 import static java.awt.Color.*;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -44,7 +40,7 @@ public class MonitorThread extends Thread {
     private Boolean stopRequested = false;
     private Boolean pauseRequested = false;
     private Double FP = 0.0;
-    private ArrayList<String[]> triggerList = new ArrayList<String[]>();
+    private final ArrayList<String[]> triggerList = new ArrayList<String[]>();
 
     private NFT_Object cheapest;
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -88,7 +84,7 @@ public class MonitorThread extends Thread {
             }
         });
 
-        if (!n.getDiscord().isBlank()) {
+        if (!n.getDiscord().equals("null")) {
             dsIcon.setToolTipText(n.getDiscord());
             dsIcon.setIcon(new ImageIcon("ds.png"));
             dsIcon.addMouseListener(new MouseAdapter() {
@@ -102,7 +98,7 @@ public class MonitorThread extends Thread {
                 }
             });
         }
-        if (!n.getTwitter().isBlank()) {
+        if (!n.getTwitter().equals("null")) {
             twIcon.setToolTipText(n.getTwitter());
             twIcon.setIcon(new ImageIcon("tw.png"));
             twIcon.addMouseListener(new MouseAdapter() {
@@ -116,7 +112,7 @@ public class MonitorThread extends Thread {
                 }
             });
         }
-        if (!n.getWebsite().isBlank()) {
+        if (!n.getWebsite().equals("null")) {
             wbIcon.setToolTipText(n.getWebsite());
             wbIcon.setIcon(new ImageIcon("wb.png"));
             wbIcon.addMouseListener(new MouseAdapter() {
@@ -246,9 +242,8 @@ public class MonitorThread extends Thread {
                 sleep(Delay);
 
 
-            } catch (UnirestException | NullPointerException | InterruptedException | ConcurrentModificationException |
-                     AWTException ex) {
-                System.out.println(ex.toString());
+            } catch (UnirestException | NullPointerException | InterruptedException | ConcurrentModificationException ex) {
+                System.out.println(ex);
                 System.out.println("Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
                 try {
                     sleep(5000);
