@@ -3,6 +3,8 @@ package MainProject.Graphics;
 import MainProject.Utils.JSONParser;
 import MainProject.NFTClasses.NFT_collection;
 import MainProject.database.dbConn;
+import kong.unirest.GetRequest;
+import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
@@ -41,16 +43,14 @@ public class GUI extends JFrame {
     private JLabel slideNameLabel;
     protected static final Object[] choseOption = {"Decrease", "Increase"};
 
-    private final ArrayList<NFT_collection> Coll = new ArrayList<>();
+    private ArrayList<NFT_collection> Coll = new ArrayList<>();
 
     public GUI() {
 
         super("GUI");
+
         dbConn C = new dbConn();
-
-
-        //EventQueue.invokeLater(()-> new LoginWindow(this, C.getCredentials()));
-
+        EventQueue.invokeLater(()-> new LoginWindow(this, C.getCredentials()));
 
         menu_initializer();
         statsPage_initializer();
@@ -58,16 +58,18 @@ public class GUI extends JFrame {
         setSize(600, 400);
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(true);
+        setVisible(false);
     }
 
     private void menu_initializer() {
         JMenuItem addCollection = new JMenuItem("Add Collection");
+        JMenuItem Exit = new JMenuItem("Exit");
         JMenuItem Remove = new JMenuItem("Remove");
         JMenuItem Pause = new JMenuItem("Pause");
         JMenuItem Restart = new JMenuItem("Restart");
         JMenuItem Trigger = new JMenuItem("Add Trigger");
         menu.add(addCollection);
+        menu.add(Exit);
         edit.add(Remove);
         edit.add(Pause);
         edit.add(Restart);
@@ -80,23 +82,26 @@ public class GUI extends JFrame {
                 return;
             }
 
-            MonitorThread M;
-            M = new MonitorThread(tabbedPane, n);
+            MonitorThread M = new MonitorThread(tabbedPane, n);
             M.start();
             n.setMonitorTread(M);
             Coll.add(n);
             loadingLabel.setText("Monitoring " + Coll.size() + " Collection");
         });
+        Exit.addActionListener(e -> {
+            System.exit(0);
+        });
         Remove.addActionListener(e -> {
             if (Coll.size() == 0) return;
             int index = tabbedPane.getSelectedIndex();
-
             if (index == 0) return;
+
             tabbedPane.remove(index);
             index--;
+
             MonitorThread tmp = Coll.get(index).getMonitorThread();
-            //tmp.stop();
             tmp.RequestStop();
+
             Coll.remove(index);
             loadingLabel.setText("Monitoring " + Coll.size() + " Collection");
         });
@@ -134,9 +139,9 @@ public class GUI extends JFrame {
         Thread T = new Thread(() -> {
             while (true) {
                 try {
-
-                    if (Unirest.get("https://api.solanart.io/get_solana_tps").asString().getStatusText().equals("OK")) {
-                        String tps = JSONParser.parseFromString(Unirest.get("https://api.solanart.io/get_solana_tps").asString().getBody(), "tps");
+                    GetRequest response = Unirest.get("https://api.solanart.io/get_solana_tps");
+                    if (response.asString().getStatusText().equals("OK")) {
+                        String tps = JSONParser.parseFromString(response.asString().getBody(), "tps");
                         tpsLabel.setText("TPS: " + tps);
                     }
                     try {
@@ -164,13 +169,14 @@ public class GUI extends JFrame {
         Thread T = new Thread(() -> {
             while (true) {
                 try {
-                    if (Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getStatusText().equals("OK")) {
+                    GetRequest response =  Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true");
+                    if (response.asString().getStatusText().equals("OK")) {
                         String[] s = {"total", "last24Hrs"};
-                        s = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true").asString().getBody(), s);
+                        s = JSONParser.parseFromString(response.asString().getBody(), s);
                         volume24HLabel.setText("24H Volume: " + (int) Double.parseDouble(s[1]) + " SOL");
                         totalVolumeLabel.setText("Total Volume: " + (int) Double.parseDouble(s[0]) + " SOL");
                     }
-                    sleep(60000);
+                    sleep(10000);
                 } catch (UnirestException | NullPointerException | InterruptedException e) {
                     System.out.println("Exception from retriving ME volumes");
                     volumes();
@@ -184,16 +190,18 @@ public class GUI extends JFrame {
     private void imageSlider() {
         Thread T = new Thread(() -> {
             ArrayList<Object[]> iconArrayList = new ArrayList<>();
+
             try {
+                //si ricavano le 5 collezioni più popolari negli ultii 7 giorni da mostrare poi nella stats page
                 URL url = null;
                 ImageIcon icon;
                 Image resizedIcon;
                 String[] s = {"image", "name", "symbol"};
-                String[][] result = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/popular_collections?more=true&timeRange=7d&edge_cache=true")
+                String[][] result = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.dev/popular_collections?more=true&timeRange=7d&edge_cache=true")
                         .asString()
                         .getBody(), s, 5);
                 for (String[] str : result) {
-                    url = new URL(str[0]);
+                    url = new URL("https://img-cdn.magiceden.dev/rs:fill:320:320:0:0/plain/"+str[0]);
                     icon = new ImageIcon(url);
                     resizedIcon = icon.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT);
                     iconArrayList.add(new Object[]{str[1], resizedIcon, "https://magiceden.io/marketplace/" + str[2]});
@@ -202,7 +210,7 @@ public class GUI extends JFrame {
                 imageSlider();
                 return;
             }
-
+            //image slider
             while (true) {
                 for (int i = 0; i < 5; i++) {
                     radioButton1.setSelected(i == 0);
@@ -230,7 +238,8 @@ public class GUI extends JFrame {
         Thread T = new Thread(() -> {
             while (true) {
                 try {
-                    if (Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getStatusText().equals("OK")) {
+                    GetRequest response = Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT");
+                    if (response.asString().getStatusText().equals("OK")) {
 
                         String s = JSONParser.parseFromString(Unirest.get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getBody(), "price");
                         solusdtLabel.setText("SOL/USDT: " + s.substring(0, 4) + "$");
@@ -246,9 +255,18 @@ public class GUI extends JFrame {
     }
 
     private void statsPage_initializer() {
-        //sutup ME image
+        //setup ME image
         ImageIcon image = new ImageIcon("me.png");
         imageLabel.setIcon(image);
+        imageLabel.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://magiceden.io/collections?type=popular"));
+                } catch (IOException | URISyntaxException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
 
         ImageIcon gif = new ImageIcon("rotate.gif");
         gifLabel.setIcon(gif);
@@ -266,8 +284,5 @@ public class GUI extends JFrame {
         tps();
         volumes();
         exchange();
-
     }
-
-
 }

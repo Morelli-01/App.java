@@ -19,10 +19,10 @@ public class dbConn {
             try {
                 DBManager.setConnection(DBManager.JDBC_Driver_SQLite, DBManager.JDBC_URL_SQLite);
                 Statement statement = DBManager.getConnection().createStatement();
+                //database di prova creato sul momento
                 try {
                     statement.executeQuery("SELECT * FROM Credentials LIMIT 1");
-                } catch (
-                        SQLException e) {
+                } catch (SQLException e) {
                     statement.executeUpdate("DROP TABLE IF EXISTS Credentials");
                     statement.executeUpdate("CREATE TABLE Credentials (Username VARCHAR(50) not null," +
                             "Psw varchar(50) not null, " +
@@ -30,7 +30,7 @@ public class dbConn {
                     statement.executeUpdate("INSERT INTO Credentials VALUES ('Utente1', 'Utente1')");
                     statement.executeUpdate("INSERT INTO Credentials VALUES ('Utente2', 'Utente2')");
                     statement.executeUpdate("INSERT INTO Credentials VALUES ('Utente3', 'Utente3')");
-                    statement.executeUpdate("INSERT INTO Credentials VALUES ('DebugUser', 'debug')");
+
                 }
                 ResultSet rs = statement.executeQuery("select * from Credentials");
                 int i = 1;

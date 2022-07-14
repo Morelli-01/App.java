@@ -9,7 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    //id("io.github.file5.guidesigner") version "1.0.2"
+    id("io.github.file5.guidesigner") version "1.0.2"
 }
 
 repositories {

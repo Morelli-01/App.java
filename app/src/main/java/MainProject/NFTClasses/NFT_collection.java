@@ -3,14 +3,12 @@ package MainProject.NFTClasses;
 
 import MainProject.Graphics.MonitorThread;
 import MainProject.Utils.JSONParser;
+import kong.unirest.GetRequest;
 import kong.unirest.Unirest;
 import javax.swing.*;
 import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static java.lang.Thread.sleep;
-
 
 public class NFT_collection{
     private String name=null;
@@ -99,17 +97,17 @@ public class NFT_collection{
     }
 
     public boolean init(String collectionName) {
-        //  System.out.println(collectionName);
-        //TODO: handling request for collection like "eclypse"" that don't have a website
-        if(Unirest.get("https://api-mainnet.magiceden.io/collections/"+collectionName+"?edge_cache=true").asString().getStatusText().equals("OK")){
-        String[] str = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/collections/" + collectionName + "?edge_cache=true").asString().getBody(),
+        // System.out.println(collectionName);
+        GetRequest response = Unirest.get("https://api-mainnet.magiceden.io/collections/"+collectionName+"?edge_cache=true");
+        if(response.asString().getStatusText().equals("OK")){
+        String[] str = JSONParser.parseFromString(response.asString().getBody(),
                new String[]{"description","discord", "symbol", "twitter", "website", "image" });
             setDescription(str[0]);
             setDiscord(str[1]);
             setName(str[2]);
             setTwitter(str[3]);
             setWebsite(str[4]);
-            setCollectionPic(str[5]);
+            setCollectionPic("https://img-cdn.magiceden.dev/rs:fill:320:320:0:0/plain/"+str[5]);
             return true;
         }
         return false;
