@@ -11,6 +11,7 @@ import java.awt.*;
 
 
 public class App {
+
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(new FlatDarkLaf());
         EventQueue.invokeLater(GUI::new);

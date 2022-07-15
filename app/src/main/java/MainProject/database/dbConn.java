@@ -9,9 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class dbConn {
-        Map Credentials;
+        Map<String, String> Credentials;
 
-    public Map getCredentials() {
+    public Map<String, String> getCredentials() {
         return Credentials;
     }
 
@@ -33,7 +33,6 @@ public class dbConn {
 
                 }
                 ResultSet rs = statement.executeQuery("select * from Credentials");
-                int i = 1;
                 int userindex = rs.findColumn("Username");
                 int pswindex = rs.findColumn("Psw");
                 Map<String, String> map = new LinkedHashMap<String, String>();

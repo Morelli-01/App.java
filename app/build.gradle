@@ -9,12 +9,15 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id("io.github.file5.guidesigner") version "1.0.2"
+    //id("io.github.file5.guidesigner") version "1.0.2"
+
+
 }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+
 }
 
 dependencies {
@@ -22,6 +25,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 
     // This dependency is used by the application.
+    implementation 'com.intellij:forms_rt:7.0.3'
     implementation 'com.konghq:unirest-java:3.13.7'
     implementation 'com.formdev:flatlaf:2.1'
     implementation 'org.jetbrains:annotations:23.0.0'
@@ -37,7 +41,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
     implementation 'com.formdev:flatlaf:2.1'
-    implementation 'com.intellij:forms_rt:7.0.3'
 
 }
 
