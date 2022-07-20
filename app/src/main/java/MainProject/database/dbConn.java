@@ -42,8 +42,10 @@ public class dbConn {
                     map.put(usr, psw);
                 }
                 Credentials=map;
+                statement.close();
             }catch(SQLException e){
                 System.out.println(e.getMessage());
+                
             }
         }
 }
