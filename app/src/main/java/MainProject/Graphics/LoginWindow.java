@@ -22,16 +22,6 @@ public class LoginWindow extends JFrame implements ActionListener {
     private static final JMenu questmenu = new JMenu("help");
     private static final JMenuBar menuBar = new JMenuBar();
     private int Tentativi = 3;
-    Boolean isDebugUser = false;
-
-    
-    public Boolean getIsDebugUser() {
-        return isDebugUser;
-    }
-
-    public void setIsDebugUser(Boolean isDebugUser) {
-        this.isDebugUser = isDebugUser;
-    }
 
     public String getUser() {
         return User;
@@ -109,44 +99,43 @@ public class LoginWindow extends JFrame implements ActionListener {
     public static void exitSystem() {
         System.exit(0);
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==ExitButton){
-                exitSystem();
+        if (e.getSource() == ExitButton) {
+            exitSystem();
         }
-        if(e.getSource()==OKButton){
+        if (e.getSource() == OKButton) {
             String UserName = CampoNome.getText();
             String UserPsw = String.valueOf(CampoPSW.getPassword());
-            if (!Credential.containsKey(UserName)){
+            if (!Credential.containsKey(UserName)) {
                 Tentativi--;
-                JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+Tentativi+".","Error",
-                    JOptionPane.ERROR_MESSAGE);
-            }
-            else if(!Credential.get(UserName).equals(UserPsw)){
+                JOptionPane.showMessageDialog(null, "Credenziali errate, tentativi rimasti " + Tentativi + ".", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (!Credential.get(UserName).equals(UserPsw)) {
                 Tentativi--;
-                JOptionPane.showMessageDialog(null,"Credenziali errate, tentativi rimasti "+Tentativi+".","Error",
-                    JOptionPane.ERROR_MESSAGE);       
-            }else{
+                JOptionPane.showMessageDialog(null, "Credenziali errate, tentativi rimasti " + Tentativi + ".", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
 
-             User=UserName;
-             Psw=UserPsw;
-             System.out.println("Succesfull Login"); //Attivazione GUI di nick
-             setGUIVisible(true);
-             dispose();
-             if(User.equals("DebugUser")){
-                    setIsDebugUser(true);
-                }
+                User = UserName;
+                Psw = UserPsw;
+                System.out.println("Succesfull Login"); // Attivazione GUI
+                setGUIVisible(true);
+                dispose();
+
             }
 
-            if(Tentativi<=0){
-                JOptionPane.showMessageDialog(null,"Numero di tentativi finiti, il programma verrà chiuso","Error",
+            if (Tentativi <= 0) {
+                JOptionPane.showMessageDialog(null, "Numero di tentativi finiti, il programma verrà chiuso", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 exitSystem();
             }
         }
-        if(e.getSource()==helpItem){
-            JOptionPane.showMessageDialog(null, "Inserire le credenziali per poter accedere all'applicazione", "Help", JOptionPane.INFORMATION_MESSAGE);
+        if (e.getSource() == helpItem) {
+            JOptionPane.showMessageDialog(null, "Inserire le credenziali per poter accedere all'applicazione", "Help",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
-    
+
 }

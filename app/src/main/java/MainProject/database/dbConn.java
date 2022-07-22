@@ -2,6 +2,7 @@ package MainProject.database;
 
 import MainProject.Utils.DBManager;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,9 +17,12 @@ public class dbConn {
     }
 
     public dbConn() {
+        Connection connection=null;
+        Statement statement=null;
             try {
                 DBManager.setConnection(DBManager.JDBC_Driver_SQLite, DBManager.JDBC_URL_SQLite);
-                Statement statement = DBManager.getConnection().createStatement();
+                connection= DBManager.getConnection();
+                statement = connection.createStatement();
                 //database di prova creato sul momento
                 try {
                     statement.executeQuery("SELECT * FROM Credentials LIMIT 1");
@@ -30,7 +34,7 @@ public class dbConn {
                     statement.executeUpdate("INSERT INTO Credentials VALUES ('Utente1', 'Utente1')");
                     statement.executeUpdate("INSERT INTO Credentials VALUES ('Utente2', 'Utente2')");
                     statement.executeUpdate("INSERT INTO Credentials VALUES ('Utente3', 'Utente3')");
-
+                    
                 }
                 ResultSet rs = statement.executeQuery("select * from Credentials");
                 int userindex = rs.findColumn("Username");
@@ -42,10 +46,19 @@ public class dbConn {
                     map.put(usr, psw);
                 }
                 Credentials=map;
-                statement.close();
             }catch(SQLException e){
                 System.out.println(e.getMessage());
                 
+            }finally{
+                if(connection != null){
+                    try {
+                        statement.close();
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    
+                }
             }
         }
 }

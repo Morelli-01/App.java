@@ -77,7 +77,6 @@ public class MonitorThread extends Thread {
                 }
             }
         });
-
         newCheap.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -98,6 +97,7 @@ public class MonitorThread extends Thread {
                     try {
                         Desktop.getDesktop().browse(new URI(n.getDiscord()));
                     } catch (IOException | URISyntaxException ex) {
+
                         System.out.println("Errore nell'apertura del link: " + n.getDiscord());
                     }
                 }
@@ -258,10 +258,12 @@ public class MonitorThread extends Thread {
             } catch (UnirestException | NullPointerException | InterruptedException
                     | ConcurrentModificationException ex) {
                 System.out.println(ex.getStackTrace());
-                System.out.println("Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
+                System.out.println(
+                        "Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
                 try {
                     sleep(5000);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                }
             }
         }
         stopRequested = false;

@@ -29,7 +29,7 @@ public class DBManager {
         String path = String.format("%s%s%s%s%s", System.getProperty("user.home"), System.getProperty("file.separator"),
                 "Desktop", System.getProperty("file.separator"), "demo");
         new File(path).mkdirs();
-        return path;
+        return path;    
     }
 
     public static void setConnection(String Driver, String URL) {
