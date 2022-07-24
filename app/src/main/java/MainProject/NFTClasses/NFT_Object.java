@@ -3,7 +3,9 @@ package MainProject.NFTClasses;
 import MainProject.Utils.JSONParser;
 import kong.unirest.Unirest;
 
-
+/*
+ * This class is the rapresentation of a single NFT
+ */
 
 public class NFT_Object {
     private String NftToken;

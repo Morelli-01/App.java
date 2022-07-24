@@ -3,6 +3,7 @@ package MainProject.Graphics;
 import MainProject.Utils.JSONParser;
 import MainProject.NFTClasses.NFT_collection;
 import MainProject.database.dbConn;
+
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -18,6 +19,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +28,17 @@ import java.util.Locale;
 import static java.lang.Thread.sleep;
 import static javax.swing.JOptionPane.*;
 
+/*
+ *  Class that define the main panel of the GUI,
+ *  after a Succefull Login the GUI will be showed,
+ *  with a basic Menu Bar containign the essentials button to manipulate the tool.
+ *  Other then that the GUI will start with an Statistics page rapresenting
+ *  some of the most important information about the market:
+ *      -TPS(transaction per second): basically a status of the solana network, if it goe to zero it means that the block production of the network has halted
+ *      -SOL/USDT: the value of the cryptocurency SOLANA in dollars
+ *      -24H Volume and TotalVolume: these two are the rapresentation of how much worth the NFT martket on solana
+ *  Other than that there is also an image slider that shows the most popular collection in the last 7 days
+ */
 public class GUI extends JFrame {
 
     private JTabbedPane tabbedPane;
@@ -47,8 +61,10 @@ public class GUI extends JFrame {
     private JRadioButton radioButton4;
     private JRadioButton radioButton5;
     private JLabel slideNameLabel;
-    protected static final String[] choseOption = { "Decrease", "Increase" };
-
+    protected static final String[] choseOption = {"Decrease", "Increase"};
+    protected static final String DECREASE = choseOption[0];
+    protected static final String INCREASE = choseOption[1];
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
     private List<NFT_collection> Coll = new ArrayList<>();
 
     public GUI() {
@@ -56,7 +72,7 @@ public class GUI extends JFrame {
         super("GUI");
 
         dbConn C = new dbConn();
-        
+
         EventQueue.invokeLater(() -> new LoginWindow(this, C.getCredentials()));
 
         menu_initializer();
@@ -155,24 +171,16 @@ public class GUI extends JFrame {
         Thread T = new Thread(() -> {
             while (true) {
                 try {
+                    sleep(10000);
                     GetRequest response = Unirest.get("https://api.solanart.io/get_solana_tps");
                     if (response.asString().getStatusText().equals("OK")) {
                         String tps = JSONParser.parseFromString(response.asString().getBody(), "tps");
                         tpsLabel.setText("TPS: " + tps);
                     }
-                    try {
-                        sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
 
-                } catch (NullPointerException | UnirestException e) {
-                    System.out.println("Something went wrong with solanart api");
-                    try {
-                        sleep(10000);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                } catch (NullPointerException | UnirestException | InterruptedException e) {
+                    System.out.println("[" + dtf.format(LocalDateTime.now()) + "] " +
+                            "Something went wrong with solanart api");
                 }
             }
         }, "TPS");
@@ -185,14 +193,15 @@ public class GUI extends JFrame {
                 try {
                     GetRequest response = Unirest.get("https://api-mainnet.magiceden.io/volumes?edge_cache=true");
                     if (response.asString().getStatusText().equals("OK")) {
-                        String[] s = { "total", "last24Hrs" };
+                        String[] s = {"total", "last24Hrs"};
                         s = JSONParser.parseFromString(response.asString().getBody(), s);
                         volume24HLabel.setText("24H Volume: " + (int) Double.parseDouble(s[1]) + " SOL");
                         totalVolumeLabel.setText("Total Volume: " + (int) Double.parseDouble(s[0]) + " SOL");
                     }
                     sleep(10000);
                 } catch (UnirestException | NullPointerException | InterruptedException e) {
-                    System.out.println("Exception from retriving ME volumes");
+                    System.out.println("[" + dtf.format(LocalDateTime.now()) + "] " +
+                            "Exception from retriving ME volumes");
                 }
             }
         }, "Volumes");
@@ -202,47 +211,48 @@ public class GUI extends JFrame {
     private void imageSlider() {
         Thread T = new Thread(() -> {
             ArrayList<Object[]> iconArrayList = new ArrayList<>();
-
-            try {
-                // si ricavano le 5 collezioni più popolari negli ultii 7 giorni da mostrare poi
-                // nella stats page
-                URL url = null;
-                ImageIcon icon;
-                Image resizedIcon;
-                String[] s = { "image", "name", "symbol" };
-                String[][] result = JSONParser.parseFromString(Unirest.get(
-                        "https://api-mainnet.magiceden.dev/popular_collections?more=true&timeRange=7d&edge_cache=true")
-                        .asString()
-                        .getBody(), s, 5);
-                for (String[] str : result) {
-                    url = new URL("https://img-cdn.magiceden.dev/rs:fill:320:320:0:0/plain/" + str[0]);
-                    icon = new ImageIcon(url);
-                    resizedIcon = icon.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT);
-                    iconArrayList
-                            .add(new Object[] { str[1], resizedIcon, "https://magiceden.io/marketplace/" + str[2] });
-                }
-            } catch (NullPointerException | UnirestException | MalformedURLException e) {
-                imageSlider();
-                return;
-            }
-            // image slider
+            Integer count = 100;
             while (true) {
-                for (int i = 0; i < 5; i++) {
-                    radioButton1.setSelected(i == 0);
-                    radioButton2.setSelected(i == 1);
-                    radioButton3.setSelected(i == 2);
-                    radioButton4.setSelected(i == 3);
-                    radioButton5.setSelected(i == 4);
-                    Object[] s = iconArrayList.get(i);
-                    ImageIcon tmp = new ImageIcon((Image) s[1]);
-                    slideImageLabel.setIcon(tmp);
-                    slideNameLabel.setText((String) s[0]);
-                    slideNameLabel.setToolTipText((String) s[2]);
-                    try {
-                        sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                try {
+                    if(count==100) {
+                        // si ricavano le 5 collezioni più popolari negli ultii 7 giorni da mostrare poi nella stats page
+                        URL url = null;
+                        ImageIcon icon;
+                        Image resizedIcon;
+                        String[] s = {"image", "name", "symbol"};
+                        String[][] result = JSONParser.parseFromString(Unirest.get(
+                                        "https://api-mainnet.magiceden.dev/popular_collections?more=true&timeRange=7d&edge_cache=true")
+                                .asString()
+                                .getBody(), s, 5);
+                        for (String[] str : result) {
+                            url = new URL("https://img-cdn.magiceden.dev/rs:fill:320:320:0:0/plain/" + str[0]);
+                            icon = new ImageIcon(url);
+                            resizedIcon = icon.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT);
+                            iconArrayList.add(new Object[]{str[1], resizedIcon, "https://magiceden.io/marketplace/" + str[2]});
+                        }
+                        count=0;
                     }
+                    else{count++;}
+                    for (int i = 0; i < 5; i++) {
+                        radioButton1.setSelected(i == 0);
+                        radioButton2.setSelected(i == 1);
+                        radioButton3.setSelected(i == 2);
+                        radioButton4.setSelected(i == 3);
+                        radioButton5.setSelected(i == 4);
+                        Object[] obj = iconArrayList.get(i);
+                        ImageIcon tmp = new ImageIcon((Image) obj[1]);
+                        slideImageLabel.setIcon(tmp);
+                        slideNameLabel.setText((String) obj[0]);
+                        slideNameLabel.setToolTipText((String) obj[2]);
+
+                        sleep(3000);
+
+                    }
+
+                } catch (NullPointerException | UnirestException | MalformedURLException | InterruptedException e) {
+                    System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "+
+                            "Some error about the image slider");
+                    System.out.println(e.getMessage());
                 }
             }
         }, "ImageSlider");
@@ -257,13 +267,14 @@ public class GUI extends JFrame {
                     if (response.asString().getStatusText().equals("OK")) {
 
                         String s = JSONParser.parseFromString(Unirest
-                                .get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getBody(),
+                                        .get("https://api.binance.com/api/v3/avgPrice?symbol=SOLUSDT").asString().getBody(),
                                 "price");
                         solusdtLabel.setText("SOL/USDT: " + s.substring(0, 4) + "$");
                     }
                     sleep(10000);
                 } catch (NullPointerException | UnirestException | InterruptedException e) {
-                    System.out.println("Exception from " + this.getName() + " regarding exchange class");
+                    System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "+
+                            "Exception from " + this.getName() + " regarding exchange class");
                 }
             }
         }, "Exchange");

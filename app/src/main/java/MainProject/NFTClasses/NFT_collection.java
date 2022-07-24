@@ -9,7 +9,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+/*
+ *  This class is the rapresentation of a collection of NFT, 
+ *  it contain the basics and also more important information about it.
+ *  It also has a method to initialize it starting from its own name  
+ */
 public class NFT_collection{
     private String name=null;
     private String description;

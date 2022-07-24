@@ -3,6 +3,9 @@ package MainProject.Utils;
 
 import java.util.Scanner;
 
+/*
+ * This class contain 3 usefull tools to deal with json responses
+ */
 public class JSONParser {
 
     static public String parseFromString(String s, String value){

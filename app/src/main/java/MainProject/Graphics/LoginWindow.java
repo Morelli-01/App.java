@@ -5,7 +5,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
-
+/*
+ *  That class administrate the login panel, starting from initialize the database that contain the credentials
+ *  to login to the GUI, and then showing as visible the GUi once the verification has succed
+ *  The original idea was to have a remote database where menage all the licences,
+ *  and so the current application had to connect to it to verificate the credential. 
+ */
 public class LoginWindow extends JFrame implements ActionListener {
     private String User;
     private String Psw;
