@@ -274,7 +274,7 @@ public class MonitorThread extends Thread {
                 // aggiunte dalla append
 
                 Y.setValue(Y.getMaximum());
-                System.out.println(String.valueOf( Double.parseDouble(spinner.getValue().toString()) * 1000));
+
                 Delay = (int) ((double) spinner.getValue() * 1000);
                 sleep(Delay);
 
