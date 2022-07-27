@@ -81,6 +81,7 @@ public class GUI extends JFrame {
         setSize(600, 400);
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         setVisible(false);
     }
 
@@ -97,7 +98,7 @@ public class GUI extends JFrame {
         edit.add(Pause);
         edit.add(Restart);
         edit.add(Trigger);
-        addCollection.addActionListener(e -> {
+        addCollection.addActionListener((e) -> {
             NFT_collection n = new NFT_collection();
             String input = showInputDialog(mainPanel, "Please insert a valid Collection name");
             if (input == null || !n.init(input)) {
@@ -214,7 +215,7 @@ public class GUI extends JFrame {
             Integer count = 100;
             while (true) {
                 try {
-                    if(count==100) {
+                    if(count>=100) {
                         // si ricavano le 5 collezioni più popolari negli ultii 7 giorni da mostrare poi nella stats page
                         URL url = null;
                         ImageIcon icon;

@@ -27,9 +27,9 @@ public class NFT_Object {
         this.MEurl = "https://magiceden.io/item-details/"+this.NftToken;
         this.price = price;
         this.collectionName = collectionName;
-        objName = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/rpc/getNFTByMintAddress/"+
-                this.NftToken +"?useRarity=true").asString().getBody(), "title");
-     // objName = JSONParser.parseFromString(Unirest.get("https://public-api.solscan.io/token/meta?tokenAddress="+this.NftToken).asString().getBody(), "name");
+        /*objName = JSONParser.parseFromString(Unirest.get("https://api-mainnet.magiceden.io/rpc/getNFTByMintAddress/"+
+                this.NftToken +"?useRarity=true").asString().getBody(), "title");*/
+        objName = JSONParser.parseFromString(Unirest.get("https://public-api.solscan.io/token/meta?tokenAddress="+this.NftToken).asString().getBody(), "name");
 
     }
 

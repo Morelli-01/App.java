@@ -11,20 +11,14 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
 
 import static java.awt.Color.*;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -60,11 +54,10 @@ public class MonitorThread extends Thread {
     private Boolean stopRequested = false;
     private Boolean pauseRequested = false;
     private Double FP = 0.0;
-    private final List<String[]> triggerList = new ArrayList<String[]>();
+    private final List<String[]> triggerList = new ArrayList<>();
     private NFT_Object cheapest;
     private Integer Delay;
     private JScrollBar Y;
-
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -191,107 +184,110 @@ public class MonitorThread extends Thread {
 
     @Override
     public void run() {
-        Thread T = new Thread(() -> {
-            // stampa del floorprice attuale e del volume nelle ultime 24h
+            Thread T = new Thread(() -> {
+                // stampa del floorprice attuale e del volume nelle ultime 24h
+                while (!stopRequested) {
+                    try {
+                        String[] s = JSONParser.parseFromString(Unirest
+                                .get("https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/" +
+                                        n.getName() +
+                                        "?edge_cache=true")
+                                .asString()
+                                .getBody(), new String[]{"volume24hr", "listedCount"});
+                        Integer v24 = (int) (Double.parseDouble(s[0]) / Math.pow(10, 9));
+                        this.volume24h.setText("Volume in last 24h :" + v24 + " SOL");
+                        this.listedCount.setText("Listed Count: " + s[1]);
+                        sleep(60000);
+                    }catch (UnirestException | NullPointerException | InterruptedException e) {
+                        System.out.println("Probably some error on me end about "+ this.getName()+" thread of "+n.getName()+" monitor");
+                    }
+
+                }
+
+            }, "volume");
+            T.start();
+
             while (!stopRequested) {
                 try {
-                    String[] s = JSONParser.parseFromString(Unirest
-                            .get("https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/" +
-                                    n.getName() +
-                                    "?edge_cache=true")
+                    while (pauseRequested) {
+                        // System.out.println("il thread "+ this.getName() + " è in pausa");
+                        sleep(2000);
+                    }
+                    /*
+                    String[] response = JSONParser.parseFromString(Unirest.get(
+                                    "https://api-mainnet.magiceden.io/rpc/getListedNFTsByQueryLite?q=%7B%22%24match%22%3A%7B%22collectionSymbol%22%3A%22"
+                                            + n.getName()
+                                            + "%22%7D%2C%22%24sort%22%3A%7B%22takerAmount%22%3A1%7D%2C%22%24skip%22%3A0%2C%22%24limit%22%3A20%2C%22status%22%3A%5B%5D%7D")
                             .asString()
-                            .getBody(), new String[]{"volume24hr", "listedCount"});
-                    Integer v24 = (int) (Double.parseDouble(s[0]) / Math.pow(10, 9));
-                    this.volume24h.setText("Volume in last 24h :" + v24 + " SOL");
-                    this.listedCount.setText("Listed Count: " + s[1]);
-                    sleep(60000);
-                }catch (UnirestException | NullPointerException | InterruptedException e) {
-                    System.out.println("Probably some error on me end about "+ this.getName()+" thread of "+n.getName()+" monitor");
-                }
+                            .getBody(), new String[]{"mintAddress", "price", "collectionName"});
+                    */
 
-            }
+                    String[] response = JSONParser.parseFromString(Unirest.get("https://api.coralcube.io/v1/getItems?offset=0&page_size=24&ranking=price_asc&symbol="+n.getName())
+                            .asString().getBody(), new String[]{"mint", "floor_price", "symbol"});
+                    cheapest = new NFT_Object(response[0], String.valueOf(Double.parseDouble(response[1])/Math.pow(10, 9)), response[2]);
 
-        }, "volume");
-        T.start();
+                    if (FP > Double.parseDouble(cheapest.getPrice())) {
+                        newCheapLabel.setForeground(YELLOW);
+                        newCheapLabel.setText(" New cheap item : " + cheapest.getObjName());
 
-        while (!stopRequested) {
-            try {
-                while (pauseRequested) {
-                    // System.out.println("il thread "+ this.getName() + " è in pausa");
-                    sleep(2000);
-                }
-
-                String[] response = JSONParser.parseFromString(Unirest.get(
-                                "https://api-mainnet.magiceden.io/rpc/getListedNFTsByQueryLite?q=%7B%22%24match%22%3A%7B%22collectionSymbol%22%3A%22"
-                                        + n.getName()
-                                        + "%22%7D%2C%22%24sort%22%3A%7B%22takerAmount%22%3A1%7D%2C%22%24skip%22%3A0%2C%22%24limit%22%3A20%2C%22status%22%3A%5B%5D%7D")
-                        .asString()
-                        .getBody(), new String[]{"mintAddress", "price", "collectionName"});
-
-                cheapest = new NFT_Object(response[0], response[1], response[2]);
-
-                if (FP > Double.parseDouble(cheapest.getPrice())) {
-                    newCheapLabel.setForeground(YELLOW);
-                    newCheapLabel.setText(" New cheap item : " + cheapest.getObjName());
-
-                    monitorTA.setForeground(YELLOW);
-                    monitorTA.append("[" + dtf.format(LocalDateTime.now()) + "] " + n.getName()
-                            + " FloorPrice Changed :" + cheapest.getPrice() + "\n");
-                } else {
-                    newCheapLabel.setForeground(MAGENTA);
-                    newCheapLabel.setText(" cheapest item :" + cheapest.getObjName());
-
-                    monitorTA.setForeground(WHITE);
-                    monitorTA.append("[" + dtf.format(LocalDateTime.now()) + "] " + n.getName() + " FloorPrice :"
-                            + cheapest.getPrice() + "\n");
-                }
-
-                FP = Double.valueOf(cheapest.getPrice());
-
-                // controllo se il nuovo FP triggera qualche trigger
-                for (Iterator<String[]> it = triggerList.iterator(); it.hasNext(); ) {
-                    String[] str = it.next();
-                    if (str[1].equals(GUI.DECREASE)) {
-                        if (FP <= Double.parseDouble(str[0])) {
-                            // showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the
-                            // desidered floorprice of "+ str[0]);
-                            WindowsNotification.sendNotification(
-                                    "The collection " + n.getName() + " reached the desidered floorprice of " + str[0]);
-                            triggerList.remove(str);
-                        }
+                        monitorTA.setForeground(YELLOW);
+                        monitorTA.append("[" + dtf.format(LocalDateTime.now()) + "] " + n.getName()
+                                + " FloorPrice Changed :" + cheapest.getPrice() + "\n");
                     } else {
-                        if (FP >= Double.parseDouble(str[0])) {
-                            // showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the
-                            // desidered floorprice of "+ str[0]);
-                            WindowsNotification.sendNotification(
-                                    "The collection " + n.getName() + " reached the desidered floorprice of " + str[0]);
-                            triggerList.remove(str);
+                        newCheapLabel.setForeground(MAGENTA);
+                        newCheapLabel.setText(" cheapest item : " + cheapest.getObjName());
+
+                        monitorTA.setForeground(WHITE);
+                        monitorTA.append("[" + dtf.format(LocalDateTime.now()) + "] " + n.getName() + " FloorPrice :"
+                                + cheapest.getPrice() + "\n");
+                    }
+
+                    FP = Double.valueOf(cheapest.getPrice());
+
+                    // controllo se il nuovo FP triggera qualche trigger
+                    for (Iterator<String[]> it = triggerList.iterator(); it.hasNext(); ) {
+                        String[] str = it.next();
+                        if (str[1].equals(GUI.DECREASE)) {
+                            if (FP <= Double.parseDouble(str[0])) {
+                                // showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the
+                                // desidered floorprice of "+ str[0]);
+                                WindowsNotification.sendNotification(
+                                        "The collection " + n.getName() + " reached the desidered floorprice of " + str[0]);
+                                triggerList.remove(str);
+                            }
+                        } else {
+                            if (FP >= Double.parseDouble(str[0])) {
+                                // showMessageDialog(mainPanel, "The collection "+n.getName()+" reached the
+                                // desidered floorprice of "+ str[0]);
+                                WindowsNotification.sendNotification(
+                                        "The collection " + n.getName() + " reached the desidered floorprice of " + str[0]);
+                                triggerList.remove(str);
+                            }
                         }
                     }
-                }
 
-                // set della scrollbar in fondo al range così segue la scritte che vengono
-                // aggiunte dalla append
+                    // set della scrollbar in fondo al range così segue la scritte che vengono
+                    // aggiunte dalla append
 
-                Y.setValue(Y.getMaximum());
+                    Y.setValue(Y.getMaximum());
 
-                Delay = (int) ((double) spinner.getValue() * 1000);
-                sleep(Delay);
+                    Delay = (int) ((double) spinner.getValue() * 1000);
+                    sleep(Delay);
 
-            } catch (UnirestException | NullPointerException | InterruptedException
-                     | ConcurrentModificationException ex) {
-                System.out.println(ex.getStackTrace());
-                System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "+
-                        "Probably something wrong on ME end about " + this.getName() + " on collection " + n.getName());
-                try {
-                    sleep(5000);
-                } catch (InterruptedException e) {
+                } catch (UnirestException | NullPointerException | InterruptedException
+                         | ConcurrentModificationException ex) {
+                    System.out.println(ex.getMessage());
+                    System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "+
+                            "Probably something wrong on ME end about " + this.getName());
+                    try {
+                        sleep(5000);
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
+            stopRequested = false;
+            System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "+"thread stopped");
         }
-        stopRequested = false;
-        System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "+"thread stopped");
-    }
 
     {
         // GUI initializer generated by IntelliJ IDEA GUI Designer
